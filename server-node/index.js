@@ -75,3 +75,54 @@ app.get('/api/v1/cas', function (req, res) {
 		res.send(JSON.stringify(objdData));
 	});
 });
+
+
+// Récupération d'un seul cas par son id
+app.get('/api/v1/cas/:id', function(req, res) {
+	var id = req.params.id;
+
+ 	mongoDBModule.findCasById(id, function(data) {
+ 		res.send(JSON.stringify(data)); 
+ 	});
+ 
+});
+
+// Récupération de tous les temoignages
+app.get('/api/v1/temoignages', function (req, res) {
+	// Si présent on prend la valeur du param, sinon 1
+	let page = parseInt(req.query.page || 1);
+	// idem si present on prend la valeur, sinon 10
+	let pagesize = parseInt(req.query.pagesize || 10);
+
+	let name = req.query.name || '';
+
+	mongoDBModule.findAllTemoignages(page, pagesize, name, function (data, count) {
+		var objdData = {
+			data: data,
+			count: count
+        }
+        res.header("Content-Type", "application/json");
+		res.send(JSON.stringify(objdData));
+	});
+});
+
+
+// Récupération d'un seul temoignage par son id
+app.get('/api/v1/temoignages/:id', function(req, res) {
+	var id = req.params.id;
+
+ 	mongoDBModule.findTemoignageById(id, function(data) {
+ 		res.send(JSON.stringify(data)); 
+ 	});
+ 
+});
+
+//Récupération de tous les temoiganges d'un cas
+/*app.get('/api/v1/cas/:id/temoignages', function(req, res) {
+	var id = req.params.id;
+
+ 	mongoDBModule.findAllTemoignagesOfCas(id, function(data) {
+ 		res.send(JSON.stringify(data)); 
+ 	});
+ 
+});*/
