@@ -38,7 +38,7 @@ console.log("Serveur lancé sur le port : " + port);
 // Test de la connexion à la base
 app.get('/api/v1/connection', function (req, res) {
 	// Pour le moment on simule, mais après on devra
-	// réellement se connecte à la base de données
+	// réellement se connecte à la base de donnéesb
 	// et renvoyer une valeur pour dire si tout est ok
 	mongoDBModule.connexionMongo(function (err, db) {
 		let reponse;
@@ -118,11 +118,9 @@ app.get('/api/v1/temoignages/:id', function(req, res) {
 });
 
 //Récupération de tous les temoiganges d'un cas
-/*app.get('/api/v1/cas/:id/temoignages', function(req, res) {
+app.get('/api/v1/cas/:id/temoignages', function(req, res) {
 	var id = req.params.id;
-
  	mongoDBModule.findAllTemoignagesOfCas(id, function(data) {
- 		res.send(JSON.stringify(data)); 
+ 		res.send(data);
  	});
- 
-});*/
+});

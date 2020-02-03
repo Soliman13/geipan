@@ -184,16 +184,18 @@ exports.findTemoignageById = function(id, callback) {
         }
     });
 }
-/*exports.findAllTemoignagesOfCas = function(id, callback) {
+exports.findAllTemoignagesOfCas = function(id, callback) {
     MongoClient.connect(url, function(err, client) {
 		var db = client.db(dbName);
         if(!err) {
         	// La requete mongoDB
 
-            let myquery = { "_id": ObjectId(id)};
+            let myquery = { "id_cas": parseInt(id)};
 
-            db.collection("cas_pub") 
-            .findOne(myquery, function(err, data) {
+            db.collection("temoignages_pub") 
+            .find(myquery)
+            .toArray()
+            .then(function(err, data) {
             	let reponse;
                 console.log("response:", reponse);
                 if(!err){
@@ -209,7 +211,6 @@ exports.findTemoignageById = function(id, callback) {
                         cas : null,
                         error : err,
                         msg: "erreur lors du find"
-
                     };
                 }
                 callback(reponse);
@@ -224,4 +225,4 @@ exports.findTemoignageById = function(id, callback) {
             callback(reponse);
         }
     });
-}*/
+}
