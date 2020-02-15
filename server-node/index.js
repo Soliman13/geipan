@@ -64,18 +64,17 @@ app.get('/api/v1/cas', function (req, res) {
 	// idem si present on prend la valeur, sinon 10
 	let pagesize = parseInt(req.query.pagesize || 10);
 
-	let name = req.query.name || '';
+	let order = parseInt(req.query.order) || 0;
 
-	mongoDBModule.findAllCas(page, pagesize, name, function (data, count) {
+	mongoDBModule.findAllCas(page, pagesize, order, function (data, count) {
 		var objdData = {
 			data: data,
 			count: count
-        }
+        };
         res.header("Content-Type", "application/json");
 		res.send(JSON.stringify(objdData));
 	});
 });
-
 
 // Récupération d'un seul cas par son id
 app.get('/api/v1/cas/:id', function(req, res) {
@@ -100,7 +99,7 @@ app.get('/api/v1/temoignages', function (req, res) {
 		var objdData = {
 			data: data,
 			count: count
-        }
+        };
         res.header("Content-Type", "application/json");
 		res.send(JSON.stringify(objdData));
 	});

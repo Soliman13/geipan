@@ -16,40 +16,39 @@ exports.connexionMongo = function(callback) {
 		assert.equal(null, err);
 		callback(err, db);
 	});
-}
+};
 
-exports.findAllCas = function(page, pagesize, name, callback) {
+exports.findAllCas = function(page, pagesize, order, callback) {
     MongoClient.connect(url, function(err, client) {
 
 		var db = client.db(dbName);
 
         if(!err) {
-			if(name == ''){
+            // pas de tri sur la classification
+            if(!order) {
                 db.collection('cas_pub')
                     .find()
-                    .skip(page*pagesize)
+                    .skip(page * pagesize)
                     .limit(pagesize)
                     .toArray()
-                    .then(arr=>{
+                    .then(arr => {
                         db.collection('cas_pub')
-							.countDocuments()
-							.then(rep=>callback(arr,rep))
-					});
-			}
-			else{
-					let query = {
-						"name" : {$regex:".*"+name+".*",$options:"i"}
-					}
-                    db.collection('cas_pub')
-                    .find(query)
-                    .skip(page*pagesize)
-                    .limit(pagesize)
-                    .toArray()
-                    .then(arr=>{
-                        db.collection('cas_pub')
-                            .find(query)
                             .countDocuments()
-                            .then(rep=>callback(arr,rep))
+                            .then(rep => callback(arr, rep))
+                    });
+            }
+            //tri effectué
+            else {
+                db.collection('cas_pub')
+                    .find()
+                    .sort({cas_classification: order})
+                    .skip(page * pagesize)
+                    .limit(pagesize)
+                    .toArray()
+                    .then(arr => {
+                        db.collection('cas_pub')
+                            .countDocuments()
+                            .then(rep => callback(arr, rep))
                     });
 			}
         }
