@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,6 +9,11 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Paper from '@material-ui/core/Paper';
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import TextField from "@material-ui/core/TextField";
+import Checkbox from '@material-ui/core/Checkbox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
 
 function TableauHead(props) {
     const { classes, order, onRequestSort } = props;
@@ -17,11 +22,11 @@ function TableauHead(props) {
     };
 
     const headCells = [
-        { id: 'name', toBeOrdered: false, label: 'Nom' },
-        { id: 'resume', toBeOrdered: false, label: 'Résumé' },
-        { id: 'date', toBeOrdered: false, label: 'Date d\'observation' },
-        { id: 'lieu', toBeOrdered: false, label: 'Lieu' },
-        { id: 'classification', toBeOrdered: true, label: 'Classification' },
+        { id: 'name', toBeOrdered: false, label: 'Nom', minWidth: 150 },
+        { id: 'resume', toBeOrdered: false, label: 'Résumé', minWidth: 250, maxWidth: 250 },
+        { id: 'date', toBeOrdered: false, label: 'Date d\'observation', minWidth: 130 },
+        { id: 'zone', toBeOrdered: false, label: 'Zone', minWidth: 130},
+        { id: 'classification', toBeOrdered: true, label: 'Classification', minWidth: 220 },
     ];
 
     return (
@@ -31,7 +36,8 @@ function TableauHead(props) {
                     <TableCell
                         key={headCell.id}
                         className={classes.head}
-                        align="center">
+                        align="center"
+                        style={headCell}>
                         {headCell.toBeOrdered ? (
                             <TableSortLabel
                                 direction={order === 1 ? 'asc' : 'desc'}
@@ -77,20 +83,18 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Tableau = (props) => {
-    const classes = useStyles();
-    const [order, setOrder] = React.useState(0);
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const uncheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+    const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-    const handleRequestSort = () => {
-        order === 1 ? setOrder(-1) : setOrder(1);
+    const classes = useStyles();
+
+    const classifications = ['A', 'B', 'C', 'D', 'D1', 'Autres'];
+
+    const handleFilter = async (id, value) => {
+        props.asyncHandleChangeNameFilter(id, value);
     };
 
-    useEffect(() => {
-        props.handleChangeOrder(order);
-    }, [order]);
-
-    const handleClick = (event, name) => {
+    const handleClickRow = (event, name) => {
         // TODO open modal
         // const selectedIndex = selected.indexOf(name);
         // let newSelected = [];
@@ -111,16 +115,15 @@ const Tableau = (props) => {
         // setSelected(newSelected);
     };
 
-    const handleChangePage = (event, newPage) => {
-        props.handlerChangePage(newPage);
-        setPage(newPage);
+    const handleRequestSort = () => {
+        props.handlerChangeOrder();
     };
+
+    const handleChangePage = (event, newPage) => { props.handlerChangePage(newPage) };
 
     const handleChangeRowsPerPage = event => {
         let rowsPerPage = parseInt(event.target.value, 10);
         props.handlerChangeRowsPerPage(rowsPerPage);
-        setRowsPerPage(rowsPerPage);
-        setPage(0);
     };
 
     return (
@@ -134,14 +137,65 @@ const Tableau = (props) => {
                         aria-label="enhanced table">
                         <TableauHead
                             classes={classes}
-                            order={order}
+                            order={props.order}
                             onRequestSort={handleRequestSort} />
                         <TableBody>
+                            <TableRow>
+                                <TableCell align="center">
+                                    <TextField
+                                        label="Nom dossier"
+                                        variant="outlined"
+                                        style={{width: '100%'}}
+                                        onChange={e => handleFilter('name', e.target.value)} />
+                                </TableCell>
+                                <TableCell align="center">
+                                    <TextField
+                                        label="Résumé"
+                                        variant="outlined"
+                                        style={{width: '100%'}}
+                                        onChange={e => handleFilter('resume', e.target.value)} />
+                                </TableCell>
+                                <TableCell align="center">Filtre date</TableCell>
+                                <TableCell align="center">
+                                    <TextField
+                                        label="Zone"
+                                        variant="outlined"
+                                        style={{width: '100%'}}
+                                        onChange={e => handleFilter('zone', e.target.value)} />
+                                </TableCell>
+                                <TableCell align="center">
+                                    <Autocomplete
+                                        multiple
+                                        options={classifications}
+                                        style={{width: '100%'}}
+                                        disableCloseOnSelect
+                                        onChange={(e, value) => handleFilter('classification', value)}
+                                        getOptionLabel={classification => classification}
+                                        renderOption={(classification, { selected }) => (
+                                            <React.Fragment>
+                                                <Checkbox
+                                                    icon={uncheckedIcon}
+                                                    checkedIcon={checkedIcon}
+                                                    style={{ marginRight: 8 }}
+                                                    checked={selected} />
+                                                {classification}
+                                            </React.Fragment>
+                                        )}
+                                        renderInput={params => (
+                                            <TextField
+                                                {...params}
+                                                variant="outlined"
+                                                label="Classifications"
+                                                placeholder="Classifications"
+                                                fullWidth />
+                                        )} />
+                                </TableCell>
+                            </TableRow>
                             {props.data.map((row) => {
                                     return (
                                         <TableRow
                                             hover
-                                            onClick={event => handleClick(event, row.name)}
+                                            onClick={event => handleClickRow(event, row.name)}
                                             tabIndex={-1}
                                             key={row._id}>
                                             <TableCell component="th" scope="row" padding="default">
@@ -165,8 +219,8 @@ const Tableau = (props) => {
                     rowsPerPageOptions={[5, 10, 25, 50]}
                     component="div"
                     count={props.totalCas}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
+                    rowsPerPage={props.rowsPerPage}
+                    page={props.page}
                     onChangePage={handleChangePage}
                     onChangeRowsPerPage={handleChangeRowsPerPage} />
             </Paper>

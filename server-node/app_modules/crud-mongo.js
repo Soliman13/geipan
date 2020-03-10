@@ -18,16 +18,50 @@ exports.connexionMongo = function(callback) {
 	});
 };
 
-exports.findAllCas = function(page, pagesize, order, callback) {
+exports.findAllCas = function(page, pagesize, order, nameFilter, resumeFilter, zoneFilter, classificationFilter, callback) {
+    let selectorEntry = '{';
+    let selector = '';
+    if(nameFilter){
+        selector += '"cas_nom_dossier": {"$regex": ".*'+ nameFilter + '.*", "$options": "i"}';
+        selector += ',';
+    }
+    if(resumeFilter){
+        selector += '"cas_resume_web": {"$regex": ".*'+ resumeFilter + '.*", "$options": "i"}';
+        selector += ',';
+    }
+    if(zoneFilter){
+        selector += '"cas_zone_nom": {"$regex": ".*'+ zoneFilter + '.*", "$options": "i"}';
+        selector += ',';
+    }
+    if(classificationFilter){
+        let arrFilter = classificationFilter.split(',');
+        if(arrFilter.indexOf('Autres') !== -1){
+            const classificiations = [ "A", "B", "C", "D", "D1" ];
+            
+            let arrFormatted = classificiations.filter(value => arrFilter.indexOf(value) === -1 );
+            selector += '"cas_classification": { "$nin": ' + JSON.stringify(arrFormatted) +' } }';
+        }
+        else{
+            selector += '"cas_classification": { "$in": ' + JSON.stringify(arrFilter) + ' }';
+            selector += ',';
+        }
+    }
+    if(selector.length) {
+        selector = selector.substring(0, selector.length - 1);
+        selector = selectorEntry + selector + '}';
+    }
+    console.log("selector: " + selector);
+    let selectorJson = selector ? JSON.parse(selector) : '';
+
     MongoClient.connect(url, function(err, client) {
 
-		var db = client.db(dbName);
+		let db = client.db(dbName);
 
         if(!err) {
             // pas de tri sur la classification
             if(!order) {
                 db.collection('cas_pub')
-                    .find()
+                    .find(selectorJson)
                     .skip(page * pagesize)
                     .limit(pagesize)
                     .toArray()
@@ -40,7 +74,7 @@ exports.findAllCas = function(page, pagesize, order, callback) {
             //tri effectué
             else {
                 db.collection('cas_pub')
-                    .find()
+                    .find( selectorJson )
                     .sort({cas_classification: order})
                     .skip(page * pagesize)
                     .limit(pagesize)

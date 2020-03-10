@@ -6,6 +6,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Tableau from "./Tableau";
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -50,21 +51,73 @@ const NavigationTabs = (props) => {
     const [pageSize, setPageSize] = React.useState(5);
     const [order, setOrder] = React.useState(0);
     const [totalCas, setTotalCas] = React.useState(0);
+    const [nameFilter, setNameFilter] = React.useState('');
+    const [resumeFilter, setResumeFilter] = React.useState('');
+    const [zoneFilter, setZoneFilter] = React.useState('');
+    const [classificationFilter, setClassificationFilter] = React.useState([]);
 
-    const handleChangeTab = (newValue) => { setValue(newValue) };
+    const handleChangeTab = (event, newValue) => { setValue(newValue) };
 
-    const handlerChangeOrder = (order) => { setOrder(order) };
+    const handleChangeOrder = () => { order === 1 ? setOrder(-1) : setOrder(1); setPage(0) };
 
-    const handlerChangePage = (page) => { setPage(page) };
+    const handleChangePage = (page) => { setPage(page) };
 
-    const handlerChangeRowsPerPage = (rowPerPage) => { setPage(0); setPageSize(rowPerPage) };
+    const handleChangeRowsPerPage = (rowPerPage) => { setPage(0); setPageSize(rowPerPage) };
+
+    const asyncHandle = (id, value) => {
+        switch (id) {
+            case 'name':
+                setNameFilter(value);
+                setPage(0);
+                break;
+            case 'resume':
+                setResumeFilter(value);
+                setPage(0);
+                break;
+            case 'zone':
+                setZoneFilter(value);
+                setPage(0);
+                break;
+            case 'classification':
+                setClassificationFilter(value);
+                setPage(0);
+                break;
+            default:
+        }
+    };
+
+    const asyncHandleFilter = AwesomeDebouncePromise(
+        asyncHandle,
+        750,
+        { key: (id, text) => id },
+    );
 
     useEffect(() => {
         getDataFromServer();
-    }, [page, pageSize, order]);
+    }, [page, pageSize, order, nameFilter, resumeFilter, zoneFilter, classificationFilter]);
 
     const getDataFromServer = () => {
-        fetch('http://localhost:8080/api/v1/cas?page=' + page + '&pagesize=' + pageSize + '&order=' + order)
+        // check filters
+        let filter = '';
+        if(nameFilter) {
+            filter += "name=" + nameFilter + "&";
+        }
+        if(resumeFilter) filter += "resume=" + resumeFilter + "&";
+        if(zoneFilter) filter +="zone=" + zoneFilter + "&";
+        if(classificationFilter.length){
+            filter += "classification=";
+            // classificationFilter.forEach(value => {
+            //     filter += value;
+            // });
+            filter += classificationFilter;
+        }
+        if(filter) {
+            if(filter.endsWith('&')){
+                filter = filter.substring(0, filter.length - 1);
+            }
+        }
+        let url = 'http://localhost:8080/api/v1/cas?page=' + page + '&pagesize=' + pageSize + '&order=' + order + (filter ? '&' + filter : '');
+        fetch(url)
             .then(response => {
                 return response.json(); // transforme le json texte en objet js
             })
@@ -99,9 +152,13 @@ const NavigationTabs = (props) => {
             <TabPanel value={value} index={0}>
                 <Tableau data={cas}
                          totalCas={totalCas}
-                         handleChangeOrder={handlerChangeOrder}
-                         handlerChangePage={handlerChangePage}
-                         handlerChangeRowsPerPage={handlerChangeRowsPerPage} />
+                         page={page}
+                         rowsPerPage={pageSize}
+                         order={order}
+                         handlerChangeOrder={handleChangeOrder}
+                         handlerChangePage={handleChangePage}
+                         handlerChangeRowsPerPage={handleChangeRowsPerPage}
+                         asyncHandleChangeNameFilter={asyncHandleFilter} />
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <h2>Librairies pour des graphes data viz react</h2>

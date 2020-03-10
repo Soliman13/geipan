@@ -65,8 +65,12 @@ app.get('/api/v1/cas', function (req, res) {
 	let pagesize = parseInt(req.query.pagesize || 10);
 
 	let order = parseInt(req.query.order) || 0;
+	let nameFilter = req.query.name || '';
+	let resumeFilter = req.query.resume || '';
+	let zoneFilter = req.query.zone || '';
+	let classificationFilter = req.query.classification || '';
 
-	mongoDBModule.findAllCas(page, pagesize, order, function (data, count) {
+	mongoDBModule.findAllCas(page, pagesize, order, nameFilter, resumeFilter, zoneFilter, classificationFilter, function (data, count) {
 		var objdData = {
 			data: data,
 			count: count
