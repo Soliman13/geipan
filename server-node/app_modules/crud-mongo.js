@@ -12,7 +12,7 @@ const dbName = 'geipan';
 exports.connexionMongo = function(callback) {
 	MongoClient.connect(url, function(err, client) {
 		var db = client.db(dbName);
-		
+
 		assert.equal(null, err);
 		callback(err, db);
 	});
@@ -26,7 +26,7 @@ exports.findAllCas = function(page, pagesize, order, nameFilter, resumeFilter, z
         selector += ',';
     }
     if(resumeFilter){
-        selector += '"cas_resume_web": {"$regex": ".*'+ resumeFilter + '.*", "$options": "i"}';
+        selector += '"cas_resume": {"$regex": ".*'+ resumeFilter + '.*", "$options": "i"}';
         selector += ',';
     }
     if(zoneFilter){
@@ -50,7 +50,7 @@ exports.findAllCas = function(page, pagesize, order, nameFilter, resumeFilter, z
         selector = selector.substring(0, selector.length - 1);
         selector = selectorEntry + selector + '}';
     }
-    console.log("selector: " + selector);
+
     let selectorJson = selector ? JSON.parse(selector) : '';
 
     MongoClient.connect(url, function(err, client) {
@@ -67,21 +67,23 @@ exports.findAllCas = function(page, pagesize, order, nameFilter, resumeFilter, z
                     .toArray()
                     .then(arr => {
                         db.collection('cas_pub')
-                            .countDocuments()
+                            .find(selectorJson)
+                            .count()
                             .then(rep => callback(arr, rep))
                     });
             }
-            //tri effectué
+            //tri effectué (avec sort)
             else {
                 db.collection('cas_pub')
-                    .find( selectorJson )
+                    .find(selectorJson)
                     .sort({cas_classification: order})
                     .skip(page * pagesize)
                     .limit(pagesize)
                     .toArray()
                     .then(arr => {
                         db.collection('cas_pub')
-                            .countDocuments()
+                            .find(selectorJson)
+                            .count()
                             .then(rep => callback(arr, rep))
                     });
 			}

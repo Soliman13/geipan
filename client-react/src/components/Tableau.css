@@ -1,0 +1,12 @@
+.Row {
+  /* hauteur des lignes fixes*/
+  height: 115px;
+}
+
+.Resume {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}

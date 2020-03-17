@@ -1,4 +1,5 @@
 import React from 'react';
+import './Tableau.css';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -197,11 +198,16 @@ const Tableau = (props) => {
                                             hover
                                             onClick={event => handleClickRow(event, row.name)}
                                             tabIndex={-1}
-                                            key={row._id}>
+                                            key={row._id}
+                                            className="Row">
                                             <TableCell component="th" scope="row" padding="default">
                                                 {row.cas_nom_dossier}
                                             </TableCell>
-                                            <TableCell align="center">{row.cas_resume_web}</TableCell>
+                                            <TableCell align="justify">
+                                                <p className="Resume">
+                                                    {row.cas_resume}
+                                                </p>
+                                            </TableCell>
                                             <TableCell align="center">
                                                 {row.cas_JJ === '--' ? '' : `${row.cas_JJ}/`}
                                                 {row.cas_MM === '--' ? '' : `${row.cas_MM}/`}
