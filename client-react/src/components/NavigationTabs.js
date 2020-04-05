@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Tableau from "./Tableau";
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
+import CasePerYearGraph from "./graphs/HorizontalStackedBar/CasParAn";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -56,6 +57,8 @@ const NavigationTabs = (props) => {
     const [zoneFilter, setZoneFilter] = React.useState('');
     const [classificationFilter, setClassificationFilter] = React.useState([]);
 
+    const [dataGrapheCasParAn, setDataGrapheCasParAn] = React.useState([]);
+
     const handleChangeTab = (event, newValue) => { setValue(newValue) };
 
     const handleChangeOrder = () => { order === 1 ? setOrder(-1) : setOrder(1); setPage(0) };
@@ -94,6 +97,7 @@ const NavigationTabs = (props) => {
 
     useEffect(() => {
         getDataFromServer();
+        getDataGrapheCasParAn();
     }, [page, pageSize, order, nameFilter, resumeFilter, zoneFilter, classificationFilter]);
 
     const getDataFromServer = () => {
@@ -136,9 +140,24 @@ const NavigationTabs = (props) => {
             });
     };
 
+    const getDataGrapheCasParAn = () => {
+        let url = 'http://localhost:8080/api/v1/graphe/cas_par_an';
+        fetch(url)
+            .then(response => {
+                return response.json();
+            })
+            .then(res => {
+                console.log(res);
+                setDataGrapheCasParAn(res);
+            })
+            .catch(err => {
+                console.log("erreur dans le get data graph 1: " + err)
+            });
+    };
+
     return (
         <div className={classes.root}>
-            <AppBar position="sticky">
+            <AppBar position="static">
                 <Tabs
                     variant="fullWidth"
                     value={value}
@@ -161,11 +180,25 @@ const NavigationTabs = (props) => {
                          asyncHandleChangeNameFilter={asyncHandleFilter} />
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <h2>Librairies pour des graphes data viz react</h2>
-                https://vx-demo.now.sh/gallery<br />
-                https://formidable.com/open-source/<br />
-                https://uber.github.io/react-vis/<br />
-                https://nivo.rocks/<br />
+                <h2>Librairie utilisée</h2>
+                <a title="Nivo" href="https://nivo.rocks/">nivo</a>
+
+                <div style={{height: 1000}}>
+                    <CasePerYearGraph style={{flex: 1}} data={dataGrapheCasParAn}/>
+                    <div style={{flex: 1, marginBottom: "70px", textAlign: "justify"}}>
+                        <h4>Interprétation</h4>
+                        <p style={{marginLeft: "40px", marginRight: "40px"}}>
+                            Sur ce graphe, on peut voir que le nombre de cas recensé diffère grandement selon les années.
+                            De l'année 1937 à 1954, assez peu de cas sont recensés avec néanmoins un petit pic en 1954 avec 21 cas,
+                            dont un assez inquiétant regroupant entre 6 et 10 témoignages.
+                            <br/>
+                            A partir de l'année 1976 on peut voir une montée significative du nombre d'observations qui durera jusqu'en 18.
+                            Certaines années, tels que 1983, 1988 ou 1991 ont vu 2 cas ou plus rassemblant + de 10 témoignages, donc des cas assez louches !!
+                            <br/>
+                            A noter la période 2008-2016 avec énormément de recensement d'observation de phénoménes étranges ...
+                        </p>
+                    </div>
+                </div>
             </TabPanel>
             <TabPanel value={value} index={2}>
                 <h2>To do</h2>

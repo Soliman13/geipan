@@ -127,3 +127,55 @@ app.get('/api/v1/cas/:id/temoignages', function(req, res) {
  		res.send(data);
  	});
 });
+
+//Récupération des data pr le graphe CasParAn
+app.get('/api/v1/graphe/cas_par_an', function(req, res) {
+	const id = req.params.id;
+	mongoDBModule.findDataGrapheCasParAn(id, function(data) {
+		data = data.map((element) => {
+			let un_temoignage = 0;
+			let deux_cinq_temoignages = 0;
+			let six_dix_temoignages = 0;
+			let plus_dix_temoignages = 0;
+
+			element.id_cas.sort();
+			let current = element.id_cas[0];
+			let compteur = 1;
+			for (let i = 1; i < element.id_cas.length; i++) {
+				if (element.id_cas[i] !== current) {
+					if(compteur === 1) {
+						un_temoignage++;
+					} else if (compteur > 1 && compteur <= 5) {
+						deux_cinq_temoignages++;
+					} else if (compteur > 5 && compteur <= 10) {
+						six_dix_temoignages++;
+					} else {
+						plus_dix_temoignages++;
+					}
+
+					current = element.id_cas[i];
+					compteur = 1;
+				} else {
+					compteur++;
+				}
+			}
+			if(compteur === 1) {
+				un_temoignage++;
+			} else if (compteur > 1 && compteur <= 5) {
+				deux_cinq_temoignages++;
+			} else if (compteur > 5 && compteur <= 10) {
+				six_dix_temoignages++;
+			} else {
+				plus_dix_temoignages++;
+			}
+			return {
+				annee: element._id,
+				"1 temoignage": un_temoignage,
+				"2 a 5 temoignages": deux_cinq_temoignages,
+				"6 a 10 temoignages": six_dix_temoignages,
+				"+ de 10 temoignages": plus_dix_temoignages,
+			};
+		});
+		res.send(data);
+	});
+});
