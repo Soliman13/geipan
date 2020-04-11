@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import NavigationTabs from "./NavigationTabs";
+import PageDetails from './PageDetails';
 
 class Home extends Component {
 
@@ -8,6 +9,7 @@ class Home extends Component {
             <div>
                 <NavigationTabs />
             </div>
+            
         );
     }
 }

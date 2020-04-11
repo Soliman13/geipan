@@ -1,5 +1,7 @@
 import React from 'react';
 import './Tableau.css';
+
+import { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -15,6 +17,7 @@ import TextField from "@material-ui/core/TextField";
 import Checkbox from '@material-ui/core/Checkbox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import Modal from 'react-bootstrap/Modal'
 
 function TableauHead(props) {
     const { classes, order, onRequestSort } = props;
@@ -26,7 +29,7 @@ function TableauHead(props) {
         { id: 'name', toBeOrdered: false, label: 'Nom', minWidth: 150 },
         { id: 'resume', toBeOrdered: false, label: 'Résumé', minWidth: 250, maxWidth: 250 },
         { id: 'date', toBeOrdered: false, label: 'Date d\'observation', minWidth: 130 },
-        { id: 'zone', toBeOrdered: false, label: 'Zone', minWidth: 130},
+        { id: 'zone', toBeOrdered: false, label: 'Zone', minWidth: 130 },
         { id: 'classification', toBeOrdered: true, label: 'Classification', minWidth: 220 },
     ];
 
@@ -84,9 +87,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Tableau = (props) => {
+
     const uncheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
+    const [show, setShow] = React.useState(false);
     const classes = useStyles();
 
     const classifications = ['A', 'B', 'C', 'D', 'D1', 'Autres'];
@@ -94,26 +99,59 @@ const Tableau = (props) => {
     const handleFilter = async (id, value) => {
         props.asyncHandleChangeNameFilter(id, value);
     };
+    const [cas_id, setID] = React.useState('');
 
+    const [cas, setCas] = React.useState([]);
+
+    const getDataFromServer = () => {
+        //let url = 'http://localhost:8080/api/v1/cas/'+ cas_id;
+        let url = 'http://localhost:8080/api/v1/cas/5e309148d05f7366cbb69628';
+        fetch(url)
+
+            .then(response => {
+                console.log("reponse json= ", response);
+                return response.json(); // transforme le json texte en objet js
+            })
+            .then(res => { // res c'est le texte json de response ci-dessus
+                setCas(function (oldCas) {
+                    const newCas = res;
+                    return newCas;
+                });
+
+            })
+            .catch(err => {
+                console.log("erreur dans le get : " + err)
+            });
+
+    };
     const handleClickRow = (event, name) => {
-        // TODO open modal
-        // const selectedIndex = selected.indexOf(name);
-        // let newSelected = [];
-        //
-        // if (selectedIndex === -1) {
-        //     newSelected = newSelected.concat(selected, name);
-        // } else if (selectedIndex === 0) {
-        //     newSelected = newSelected.concat(selected.slice(1));
-        // } else if (selectedIndex === selected.length - 1) {
-        //     newSelected = newSelected.concat(selected.slice(0, -1));
-        // } else if (selectedIndex > 0) {
-        //     newSelected = newSelected.concat(
-        //         selected.slice(0, selectedIndex),
-        //         selected.slice(selectedIndex + 1),
-        //     );
-        // }
-        //
-        // setSelected(newSelected);
+        setShow(true);
+        getDataFromServer();
+        console.log('cas :' + cas);
+        return (
+            alert("coucou"),
+            <Modal size="sm" aria-labelledby="contained-modal-title-vcenter" centered show={show} onHide={() => setShow(false)}>
+                <Modal.Header closeButton="true">
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Details cas
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <h1>
+                        {cas.cas_nom_dossier}
+                    </h1>
+                    <p>ID Cas : {cas.id_cas}</p>
+                    <p>Nom de la zone : {cas.cas_zone_nom}</p>
+                    <p>Code Postal : {cas.cas_zone_code}</p>
+                    <p>Type de la zone : {cas.cas_zone_type}</p>
+                    <p>Date d'observation : {cas.cas_JJ}/{cas.cas_MM}/{cas.cas_AAAA}</p>
+                    <p>Description : {cas.cas_resume}{cas.cas_public}{cas.cas_temoignages_nb}{cas.cas_temoins_nb}</p>
+
+                </Modal.Body>
+                <Modal.Footer>
+                </Modal.Footer>
+            </Modal>
+        );
     };
 
     const handleRequestSort = () => {
@@ -193,31 +231,31 @@ const Tableau = (props) => {
                                 </TableCell>
                             </TableRow>
                             {props.data.map((row) => {
-                                    return (
-                                        <TableRow
-                                            hover
-                                            onClick={event => handleClickRow(event, row.name)}
-                                            tabIndex={-1}
-                                            key={row._id}
-                                            className="Row">
-                                            <TableCell component="th" scope="row" padding="default">
-                                                {row.cas_nom_dossier}
-                                            </TableCell>
-                                            <TableCell align="justify">
-                                                <p className="Resume">
-                                                    {row.cas_resume}
-                                                </p>
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {row.cas_JJ === '--' ? '' : `${row.cas_JJ}/`}
-                                                {row.cas_MM === '--' ? '' : `${row.cas_MM}/`}
-                                                {row.cas_AAAA}
-                                            </TableCell>
-                                            <TableCell align="center">{row.cas_zone_nom}</TableCell>
-                                            <TableCell align="center">{row.cas_classification}</TableCell>
-                                        </TableRow>
-                                    );
-                                })}
+                                return (
+                                    <TableRow
+                                        hover
+                                        onClick={event => handleClickRow(event, row.name)}
+                                        tabIndex={-1}
+                                        key={row._id}
+                                        className="Row">
+                                        <TableCell component="th" scope="row" padding="default">
+                                            {row.cas_nom_dossier}
+                                        </TableCell>
+                                        <TableCell align="justify">
+                                            <p className="Resume">
+                                                {row.cas_resume}
+                                            </p>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {row.cas_JJ === '--' ? '' : `${row.cas_JJ}/`}
+                                            {row.cas_MM === '--' ? '' : `${row.cas_MM}/`}
+                                            {row.cas_AAAA}
+                                        </TableCell>
+                                        <TableCell align="center">{row.cas_zone_nom}</TableCell>
+                                        <TableCell align="center">{row.cas_classification}</TableCell>
+                                    </TableRow>
+                                );
+                            })}
                         </TableBody>
                     </Table>
                 </TableContainer>
