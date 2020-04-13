@@ -33,7 +33,6 @@ app.use(function (req, res, next) {
 
 // Lance le serveur avec express
 server.listen(port);
-console.log("Serveur lancé sur le port : " + port);
 
 // Test de la connexion à la base
 app.get('/api/v1/connection', function (req, res) {
@@ -44,7 +43,6 @@ app.get('/api/v1/connection', function (req, res) {
 		let reponse;
 
 		if (err) {
-			console.log("erreur connexion");
 			reponse = {
 				msg: "erreur de connexion err=" + err
 			}

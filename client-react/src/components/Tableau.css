@@ -2,10 +2,20 @@
   /* hauteur des lignes fixes*/
   height: 115px;
 }
+.grandTitre{
+  padding-bottom: 20px;
+  padding-top: 20px;
+}
 
 .labelTitre{
   color :#4747d1;
   font-weight: bold;
+  padding-bottom: 2px;
+}
+.sousTitre{
+  color : #f50057;;
+  margin-left: 12px;
+  margin-bottom: 2px;
 }
 
 .desc{

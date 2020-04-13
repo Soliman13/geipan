@@ -105,7 +105,6 @@ exports.findCasById = function(id, callback) {
             db.collection("cas_pub") 
             .findOne(myquery, function(err, data) {
             	let reponse;
-                console.log("response:", reponse);
                 if(!err){
                     reponse = {
                     	succes: true,
@@ -189,7 +188,6 @@ exports.findTemoignageById = function(id, callback) {
             db.collection("temoignages_pub") 
             .findOne(myquery, function(err, data) {
             	let reponse;
-                console.log("response:", reponse);
                 if(!err){
                     reponse = {
                     	succes: true,

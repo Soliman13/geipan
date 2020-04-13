@@ -130,7 +130,6 @@ const NavigationTabs = (props) => {
                 return response.json();
             })
             .then(res => {
-                console.log(res);
                 setDataGrapheCasParAn(res);
             })
             .catch(err => {

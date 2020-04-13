@@ -92,25 +92,25 @@ const Tableau = (props) => {
         props.asyncHandleChangeNameFilter(id, value);
     };
     const [cas, setCas] = React.useState([]);
-
-    const getDataFromServer = (cas_id) => {
-        let url = 'http://localhost:8080/api/v1/cas/' + cas_id;
-        // let url = 'http://localhost:8080/api/v1/cas/5e309148d05f7366cbb69628';
+    const [listTemoignages, setListTemoignages] = React.useState([]);
+    const [totalTemoignages, setTotalTemoignages] = React.useState(0);
+    const getTemoignagesOfCas = (cas_id) => {
+        let url = 'http://localhost:8080/api/v1/cas/' + cas_id + '/temoignages';
         fetch(url)
             .then(response => {
                 return response.json(); // transforme le json texte en objet js
             })
             .then(res => { // res c'est le texte json de response ci-dessus
-                setCas(res.cas);
-                console.log("res :", res.cas)
+                setListTemoignages(res.data);
+                setTotalTemoignages(res.data.length);
             })
             .catch(err => {
                 console.log("erreur dans le get : " + err)
             });
     };
-    const handleClickRow = (event, cass) => {
-        getDataFromServer(cass._id);
-        console.log("cas global : " + cas);
+    const handleClickRow = (event, selectedCas) => {
+        setCas(selectedCas);
+        getTemoignagesOfCas(selectedCas.id_cas);
         setShow(true);
     };
     const handleRequestSort = () => props.handlerChangeOrder();
@@ -215,30 +215,41 @@ const Tableau = (props) => {
                     <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={show} onHide={() => setShow(false)}>
                         <Modal.Header>
                             <Modal.Title id="contained-modal-title-vcenter">
-                                Details {cas.cas_nom_dossier}
+                                Details du {cas.cas_nom_dossier}
                             </Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <div>
-                                <p>
-                                    <label className="labelTitre">ID Cas : </label> {cas.id_cas}
-                                </p>
-                                <p>
-                                    <label className="labelTitre">Nom de la zone : </label> {cas.cas_zone_nom}
-                                </p>
-                                <p>
-                                    <label className="labelTitre">Code Postal : </label> {cas.cas_zone_code}</p>
-                                <p>
-                                    <label className="labelTitre">Type de la zone : </label> {cas.cas_zone_type}</p>
-                                <p>
-                                    <label className="labelTitre">Date d'observation : </label> {cas.cas_JJ}/{cas.cas_MM}/{cas.cas_AAAA}</p>
+                                <h3 className="grandTitre">Résumé</h3>
+                                <label className="labelTitre">ID Cas : </label> {cas.id_cas} <br></br>
+                                <label className="labelTitre">Nom de la zone : </label> {cas.cas_zone_nom}<br></br>
+                                <label className="labelTitre">Code Postal : </label> {cas.cas_zone_code} <br></br>
+                                <label className="labelTitre">Type de la zone : </label> {cas.cas_zone_type}<br></br>
+                                <label className="labelTitre">Date d'observation : </label> {cas.cas_JJ}/{cas.cas_MM}/{cas.cas_AAAA}<br></br>
                                 <p className="desc">
-                                    <label className="labelTitre">Description : </label><br></br>{cas.cas_resume}{cas.cas_public}{cas.cas_temoignages_nb}{cas.cas_temoins_nb}</p>
-
-                                <p className="desc">
-                                    <label className="labelTitre">Témoignages : </label> Liste temoignages
+                                    <label className="labelTitre">Description : </label><br></br>{cas.cas_resume}{cas.cas_public}{cas.cas_temoignages_nb}{cas.cas_temoins_nb}<br></br>
                                 </p>
-
+                            </div>
+                            <div>
+                                <h3 className="grandTitre">Témoignages</h3>
+                                <label className="labelTitre" >Nombre de Témoignages : </label> {totalTemoignages}
+                            </div>
+                            <div>
+                                {listTemoignages.map((Element, index) => (
+                                    <div key={Element.id_temoignage}><br></br>
+                                        <p>
+                                            <label className="labelTitre">Témoignage {index + 1} </label>
+                                        </p>
+                                        <label className="sousTitre">Date d'observation : </label> {Element.obs_chrono}<br></br>
+                                        <label className="sousTitre">Age du témoin : </label> {Element.tem_age}<br></br>
+                                        <label className="sousTitre">Profession du témoins : </label> {Element.tem_xp_activite_type}<br></br>
+                                        <label className="sousTitre">Émotion du témoins : </label> {Element.obs_2_tem_reaction_types}<br></br>
+                                        <label className="sousTitre">Lieu d'observation : </label> {Element.obs_1_adr_commune} {Element.obs_1_env_sol}<br></br>
+                                        <label className="sousTitre">Nombre de Pans observés : </label> {Element.obs_nb_PAN}<br></br>
+                                        <label className="sousTitre">Mouvement / Trajectoire observé :</label> {Element.obs_1_trajectoire_types} {Element.obs_1_vitesse_lib} {Element.obs_2_trajectoire_types}<br></br>
+                                        <label className="sousTitre">Nature / Forme du Pan</label> {Element.obs_1_forme_lib} {Element.obs_1_forme_types} {Element.obs_1_PAN_nature} {Element.obs_1_caracteristiques_types}<br></br>
+                                    </div>
+                                ))}
                             </div>
 
                         </Modal.Body>
