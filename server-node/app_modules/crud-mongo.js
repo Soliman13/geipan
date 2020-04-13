@@ -230,28 +230,55 @@ exports.findAllTemoignagesOfCas = function(id, callback) {
             db.collection("temoignages_pub") 
             .find(myquery)
             .toArray()
-            .then(function(err, data) {
+            .then(function(data) {
             	let reponse;
-                console.log("response:", reponse);
-                if(!err){
-                    reponse = {
-                    	succes: true,
-                        cas : data,
-                        error : null,
-                        msg:"Details de tous les temoiganges d'un cas envoyés"
-                    };
-                } else{
-                    reponse = {
-                    	succes: false,
-                        cas : null,
-                        error : err,
-                        msg: "erreur lors du find"
-                    };
-                }
+                reponse = {
+                    succes: false,
+                    cas : null,
+                    data : data,
+                    msg: "erreur lors du find"
+                };
                 callback(reponse);
             });
         } else {
-        	let reponse = reponse = {
+        	let reponse = {
+                    	succes: false,
+                        cas : null,
+                        error : err,
+                        msg: "erreur de connexion à la base"
+                    };
+            callback(reponse);
+        }
+    });
+};
+
+exports.findDataGrapheCasParAn = function(id, callback) {
+    MongoClient.connect(url, function(err, client) {
+		var db = client.db(dbName);
+        if(!err) {
+            db.collection("temoignages_pub")
+                .aggregate(
+                    [
+                        {
+                            $group : {
+                                    _id : "$obs_AAAA",
+                                    id_cas: { $push: "$id_cas" }
+                            }
+                        },
+                        {
+                            $sort : {
+                                _id:1
+                            }
+                        }
+                    ]
+                )
+                .toArray()
+                .then(data => {
+                    callback(data);
+                })
+
+        } else {
+        	let reponse = {
                     	succes: false,
                         cas : null,
                         error : err,

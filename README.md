@@ -9,9 +9,9 @@
 # Lancement de la base de données : 
 - dans un terminal (CMD) :
 - taper la commande : mongo 
-- puis : taper "mongoimport --db=geipan --collection=cas_pub --type=csv --file=/example/cas_pub.csv --ignoreBlanks --headerLine" 
-- puis : taper "mongoimport --db=geipan --collection=temoignages_pub --type=csv --file=/example/temoignages_pub.csv --ignoreBlanks --headerLine"
-- dans le menu demarré de votre ordinateur : chercher la commande mongod puis lancer la.
+- puis : taper "mongoimport --db=geipan --collection=cas_pub --type=csv --file=/example/cas_pub.csv --ignoreBlanks --headerline" 
+- puis : taper "mongoimport --db=geipan --collection=temoignages_pub --type=csv --file=/example/temoignages_pub.csv --ignoreBlanks --headerline"
+- dans le menu demarré de votre oridnateur: chercher la commande mongod puis lancer la.
 
 # Lancement du Serveur : 
 - ouvrir un autre terminal et aller à l'emplacement du dossier server-node de ce projet 
