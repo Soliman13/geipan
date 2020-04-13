@@ -8,6 +8,7 @@ class Home extends Component {
             <div>
                 <NavigationTabs />
             </div>
+            
         );
     }
 }

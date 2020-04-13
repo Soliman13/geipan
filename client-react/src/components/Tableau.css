@@ -3,6 +3,16 @@
   height: 115px;
 }
 
+.labelTitre{
+  color :#4747d1;
+  font-weight: bold;
+}
+
+.desc{
+  text-align: justify ;
+  font-size: 16px;
+  line-height: 150%;
+}
 .Resume {
   overflow: hidden;
   text-overflow: ellipsis;

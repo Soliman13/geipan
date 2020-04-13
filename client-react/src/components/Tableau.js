@@ -15,21 +15,22 @@ import TextField from "@material-ui/core/TextField";
 import Checkbox from '@material-ui/core/Checkbox';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import Modal from 'react-bootstrap/Modal';
+import { Button } from 'react-bootstrap';
+
 
 function TableauHead(props) {
     const { classes, order, onRequestSort } = props;
     const createSortHandler = property => event => {
         onRequestSort(event, property);
     };
-
     const headCells = [
         { id: 'name', toBeOrdered: false, label: 'Nom', minWidth: 150 },
         { id: 'resume', toBeOrdered: false, label: 'Résumé', minWidth: 250, maxWidth: 250 },
         { id: 'date', toBeOrdered: false, label: 'Date d\'observation', minWidth: 130 },
-        { id: 'zone', toBeOrdered: false, label: 'Zone', minWidth: 130},
+        { id: 'zone', toBeOrdered: false, label: 'Zone', minWidth: 130 },
         { id: 'classification', toBeOrdered: true, label: 'Classification', minWidth: 220 },
     ];
-
     return (
         <TableHead>
             <TableRow>
@@ -52,7 +53,6 @@ function TableauHead(props) {
         </TableHead>
     );
 }
-
 const useStyles = makeStyles(theme => ({
     root: {
         width: '100%',
@@ -82,51 +82,43 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 'bold',
     }
 }));
-
 const Tableau = (props) => {
     const uncheckedIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
-
+    const [show, setShow] = React.useState(false);
     const classes = useStyles();
-
     const classifications = ['A', 'B', 'C', 'D', 'D1', 'Autres'];
-
     const handleFilter = async (id, value) => {
         props.asyncHandleChangeNameFilter(id, value);
     };
+    const [cas, setCas] = React.useState([]);
 
-    const handleClickRow = (event, name) => {
-        // TODO open modal
-        // const selectedIndex = selected.indexOf(name);
-        // let newSelected = [];
-        //
-        // if (selectedIndex === -1) {
-        //     newSelected = newSelected.concat(selected, name);
-        // } else if (selectedIndex === 0) {
-        //     newSelected = newSelected.concat(selected.slice(1));
-        // } else if (selectedIndex === selected.length - 1) {
-        //     newSelected = newSelected.concat(selected.slice(0, -1));
-        // } else if (selectedIndex > 0) {
-        //     newSelected = newSelected.concat(
-        //         selected.slice(0, selectedIndex),
-        //         selected.slice(selectedIndex + 1),
-        //     );
-        // }
-        //
-        // setSelected(newSelected);
+    const getDataFromServer = (cas_id) => {
+        let url = 'http://localhost:8080/api/v1/cas/' + cas_id;
+        // let url = 'http://localhost:8080/api/v1/cas/5e309148d05f7366cbb69628';
+        fetch(url)
+            .then(response => {
+                return response.json(); // transforme le json texte en objet js
+            })
+            .then(res => { // res c'est le texte json de response ci-dessus
+                setCas(res.cas);
+                console.log("res :", res.cas)
+            })
+            .catch(err => {
+                console.log("erreur dans le get : " + err)
+            });
     };
-
-    const handleRequestSort = () => {
-        props.handlerChangeOrder();
+    const handleClickRow = (event, cass) => {
+        getDataFromServer(cass._id);
+        console.log("cas global : " + cas);
+        setShow(true);
     };
-
+    const handleRequestSort = () => props.handlerChangeOrder();
     const handleChangePage = (event, newPage) => { props.handlerChangePage(newPage) };
-
     const handleChangeRowsPerPage = event => {
         let rowsPerPage = parseInt(event.target.value, 10);
         props.handlerChangeRowsPerPage(rowsPerPage);
     };
-
     return (
         <div className={classes.root}>
             <Paper className={classes.paper}>
@@ -146,14 +138,14 @@ const Tableau = (props) => {
                                     <TextField
                                         label="Nom dossier"
                                         variant="outlined"
-                                        style={{width: '100%'}}
+                                        style={{ width: '100%' }}
                                         onChange={e => handleFilter('name', e.target.value)} />
                                 </TableCell>
                                 <TableCell align="center">
                                     <TextField
                                         label="Résumé"
                                         variant="outlined"
-                                        style={{width: '100%'}}
+                                        style={{ width: '100%' }}
                                         onChange={e => handleFilter('resume', e.target.value)} />
                                 </TableCell>
                                 <TableCell align="center">Filtre date</TableCell>
@@ -161,14 +153,14 @@ const Tableau = (props) => {
                                     <TextField
                                         label="Zone"
                                         variant="outlined"
-                                        style={{width: '100%'}}
+                                        style={{ width: '100%' }}
                                         onChange={e => handleFilter('zone', e.target.value)} />
                                 </TableCell>
                                 <TableCell align="center">
                                     <Autocomplete
                                         multiple
                                         options={classifications}
-                                        style={{width: '100%'}}
+                                        style={{ width: '100%' }}
                                         disableCloseOnSelect
                                         onChange={(e, value) => handleFilter('classification', value)}
                                         getOptionLabel={classification => classification}
@@ -193,33 +185,68 @@ const Tableau = (props) => {
                                 </TableCell>
                             </TableRow>
                             {props.data.map((row) => {
-                                    return (
-                                        <TableRow
-                                            hover
-                                            onClick={event => handleClickRow(event, row.name)}
-                                            tabIndex={-1}
-                                            key={row._id}
-                                            className="Row">
-                                            <TableCell component="th" scope="row" padding="default">
-                                                {row.cas_nom_dossier}
-                                            </TableCell>
-                                            <TableCell align="justify">
-                                                <p className="Resume">
-                                                    {row.cas_resume}
-                                                </p>
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                {row.cas_JJ === '--' ? '' : `${row.cas_JJ}/`}
-                                                {row.cas_MM === '--' ? '' : `${row.cas_MM}/`}
-                                                {row.cas_AAAA}
-                                            </TableCell>
-                                            <TableCell align="center">{row.cas_zone_nom}</TableCell>
-                                            <TableCell align="center">{row.cas_classification}</TableCell>
-                                        </TableRow>
-                                    );
-                                })}
+                                return (
+                                    <TableRow
+                                        hover
+                                        onClick={event => handleClickRow(event, row)}
+                                        tabIndex={-1}
+                                        key={row._id}
+                                        className="Row">
+                                        <TableCell component="th" scope="row" padding="default">
+                                            {row.cas_nom_dossier}
+                                        </TableCell>
+                                        <TableCell align="justify">
+                                            <p className="Resume">
+                                                {row.cas_resume}
+                                            </p>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {row.cas_JJ === '--' ? '' : `${row.cas_JJ}/`}
+                                            {row.cas_MM === '--' ? '' : `${row.cas_MM}/`}
+                                            {row.cas_AAAA}
+                                        </TableCell>
+                                        <TableCell align="center">{row.cas_zone_nom}</TableCell>
+                                        <TableCell align="center">{row.cas_classification}</TableCell>
+                                    </TableRow>
+                                );
+                            })}
                         </TableBody>
                     </Table>
+                    <Modal size="lg" aria-labelledby="contained-modal-title-vcenter" centered show={show} onHide={() => setShow(false)}>
+                        <Modal.Header>
+                            <Modal.Title id="contained-modal-title-vcenter">
+                                Details {cas.cas_nom_dossier}
+                            </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div>
+                                <p>
+                                    <label className="labelTitre">ID Cas : </label> {cas.id_cas}
+                                </p>
+                                <p>
+                                    <label className="labelTitre">Nom de la zone : </label> {cas.cas_zone_nom}
+                                </p>
+                                <p>
+                                    <label className="labelTitre">Code Postal : </label> {cas.cas_zone_code}</p>
+                                <p>
+                                    <label className="labelTitre">Type de la zone : </label> {cas.cas_zone_type}</p>
+                                <p>
+                                    <label className="labelTitre">Date d'observation : </label> {cas.cas_JJ}/{cas.cas_MM}/{cas.cas_AAAA}</p>
+                                <p className="desc">
+                                    <label className="labelTitre">Description : </label><br></br>{cas.cas_resume}{cas.cas_public}{cas.cas_temoignages_nb}{cas.cas_temoins_nb}</p>
+
+                                <p className="desc">
+                                    <label className="labelTitre">Témoignages : </label> Liste temoignages
+                                </p>
+
+                            </div>
+
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="primary" onClick={() => setShow(false)}>Close</Button>
+                        </Modal.Footer>
+                    </Modal>
+
                 </TableContainer>
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 50]}
@@ -233,5 +260,4 @@ const Tableau = (props) => {
         </div>
     );
 };
-
 export default Tableau;

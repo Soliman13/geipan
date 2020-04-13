@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -11,7 +11,6 @@ import CasePerYearGraph from "./graphs/HorizontalStackedBar/CasParAn";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
-
     return (
         <Typography
             component="div"
@@ -25,7 +24,6 @@ function TabPanel(props) {
         </Typography>
     );
 }
-
 function LinkTab(props) {
     return (
         <Tab
@@ -36,18 +34,16 @@ function LinkTab(props) {
             {...props} />
     );
 }
-
 const useStyles = makeStyles(theme => ({
     root: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.paper,
     },
 }));
-
 const NavigationTabs = (props) => {
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
-    const [cas, setCas] = React.useState([]);
+    const [allCas, setAllCas] = React.useState([]);
     const [page, setPage] = React.useState(0);
     const [pageSize, setPageSize] = React.useState(5);
     const [order, setOrder] = React.useState(0);
@@ -60,13 +56,9 @@ const NavigationTabs = (props) => {
     const [dataGrapheCasParAn, setDataGrapheCasParAn] = React.useState([]);
 
     const handleChangeTab = (event, newValue) => { setValue(newValue) };
-
     const handleChangeOrder = () => { order === 1 ? setOrder(-1) : setOrder(1); setPage(0) };
-
     const handleChangePage = (page) => { setPage(page) };
-
     const handleChangeRowsPerPage = (rowPerPage) => { setPage(0); setPageSize(rowPerPage) };
-
     const asyncHandle = (id, value) => {
         switch (id) {
             case 'name':
@@ -88,35 +80,32 @@ const NavigationTabs = (props) => {
             default:
         }
     };
-
     const asyncHandleFilter = AwesomeDebouncePromise(
         asyncHandle,
         750,
         { key: (id, text) => id },
     );
-
     useEffect(() => {
         getDataFromServer();
         getDataGrapheCasParAn();
     }, [page, pageSize, order, nameFilter, resumeFilter, zoneFilter, classificationFilter]);
-
     const getDataFromServer = () => {
         // check filters
         let filter = '';
-        if(nameFilter) {
+        if (nameFilter) {
             filter += "name=" + nameFilter + "&";
         }
-        if(resumeFilter) filter += "resume=" + resumeFilter + "&";
-        if(zoneFilter) filter +="zone=" + zoneFilter + "&";
-        if(classificationFilter.length){
+        if (resumeFilter) filter += "resume=" + resumeFilter + "&";
+        if (zoneFilter) filter += "zone=" + zoneFilter + "&";
+        if (classificationFilter.length) {
             filter += "classification=";
             // classificationFilter.forEach(value => {
             //     filter += value;
             // });
             filter += classificationFilter;
         }
-        if(filter) {
-            if(filter.endsWith('&')){
+        if (filter) {
+            if (filter.endsWith('&')) {
                 filter = filter.substring(0, filter.length - 1);
             }
         }
@@ -126,14 +115,8 @@ const NavigationTabs = (props) => {
                 return response.json(); // transforme le json texte en objet js
             })
             .then(res => { // res c'est le texte json de response ci-dessus
-                setCas(function(oldCas) {
-                    const newCas = res.data;
-                    return newCas;
-                });
-                setTotalCas(function(oldTotalCas) {
-                    const newTotalCas = res.count;
-                    return newTotalCas;
-                });
+                setAllCas(res.data);
+                setTotalCas(res.count);
             })
             .catch(err => {
                 console.log("erreur dans le get : " + err)
@@ -169,15 +152,15 @@ const NavigationTabs = (props) => {
                 </Tabs>
             </AppBar>
             <TabPanel value={value} index={0}>
-                <Tableau data={cas}
-                         totalCas={totalCas}
-                         page={page}
-                         rowsPerPage={pageSize}
-                         order={order}
-                         handlerChangeOrder={handleChangeOrder}
-                         handlerChangePage={handleChangePage}
-                         handlerChangeRowsPerPage={handleChangeRowsPerPage}
-                         asyncHandleChangeNameFilter={asyncHandleFilter} />
+                <Tableau data={allCas}
+                    totalCas={totalCas}
+                    page={page}
+                    rowsPerPage={pageSize}
+                    order={order}
+                    handlerChangeOrder={handleChangeOrder}
+                    handlerChangePage={handleChangePage}
+                    handlerChangeRowsPerPage={handleChangeRowsPerPage}
+                    asyncHandleChangeNameFilter={asyncHandleFilter} />
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <h2>Librairie utilisée</h2>
@@ -213,5 +196,4 @@ const NavigationTabs = (props) => {
         </div>
     );
 };
-
 export default NavigationTabs;
