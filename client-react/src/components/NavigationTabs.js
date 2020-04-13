@@ -99,9 +99,6 @@ const NavigationTabs = (props) => {
         if (zoneFilter) filter += "zone=" + zoneFilter + "&";
         if (classificationFilter.length) {
             filter += "classification=";
-            // classificationFilter.forEach(value => {
-            //     filter += value;
-            // });
             filter += classificationFilter;
         }
         if (filter) {
@@ -147,7 +144,6 @@ const NavigationTabs = (props) => {
                     aria-label="Navigation tabs">
                     <LinkTab label="Tous les cas" />
                     <LinkTab label="Statistiques" />
-                    <LinkTab label="To do" />
                 </Tabs>
             </AppBar>
             <TabPanel value={value} index={0}>
@@ -163,7 +159,7 @@ const NavigationTabs = (props) => {
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <h2>Librairie utilisée</h2>
-                <a title="Nivo" href="https://nivo.rocks/">nivo</a>
+                <a title="Nivo" href="https://nivo.rocks" target="_blank">nivo</a>
 
                 <div style={{height: 1000}}>
                     <CasePerYearGraph style={{flex: 1}} data={dataGrapheCasParAn}/>
@@ -174,23 +170,28 @@ const NavigationTabs = (props) => {
                             De l'année 1937 à 1954, assez peu de cas sont recensés avec néanmoins un petit pic en 1954 avec 21 cas,
                             dont un assez inquiétant regroupant entre 6 et 10 témoignages.
                             <br/>
-                            A partir de l'année 1976 on peut voir une montée significative du nombre d'observations qui durera jusqu'en 18.
+                            A partir de l'année 1976 on peut voir une montée significative du nombre d'observations qui durera jusqu'en 2018.
                             Certaines années, tels que 1983, 1988 ou 1991 ont vu 2 cas ou plus rassemblant + de 10 témoignages, donc des cas assez louches !!
                             <br/>
-                            A noter la période 2008-2016 avec énormément de recensement d'observation de phénoménes étranges ...
+                            A noter la période 2007-2016 avec énormément de recensement d'observation de phénoménes étranges ...
+                        </p>
+                        <br/>
+                        <h4>Conclusion</h4>
+                        <p style={{marginLeft: "40px", marginRight: "40px"}}>
+                            On peut supposer que jusqu'à 1976, les observations n'ont peut-être pas toutes été enregistrés...
+                            Aussi, de 1976 à 2007, avec l'avénement d'internet et des nouvelles technos, on peut imaginer que "des erreurs de jugement
+                            ont été commises".
+                            <br/>
+                            Autant pour l'avant 2008 on peut douter, mais pour la période 2007-2016... Nul doute, nous avons été visité! Peut-être, ces êtres
+                            intelligents seraient amateur de smartphone Apple (Premier iPhone "EDGE" le 29 juin 2007 et iPhone "3G" en 2008),
+                            resteraient dans les environs dans l'attente du dernier modèle et donc feraient des erreurs menant à cette augmentation nette
+                            des observations...
+                            <br/>
+                            <br/>
+                            Pour nous c'est sur : Nous avons été visité par des extra-terrestres amateur de produits Apple...
                         </p>
                     </div>
                 </div>
-            </TabPanel>
-            <TabPanel value={value} index={2}>
-                <h2>To do</h2>
-                - Tab 1: Modal pop up pour afficher les données plus détaillés lors d'un clique sur le tableau,<br />
-                avec tous les témoignages pour ce cas etc <br />
-                - Tab 1: Ajouter des filtres (certaines classifications, certaines zones ...) <br />
-                <br />
-                - Tab 2: Quelques graphes statistiques ... par exemple un graphe avec le nombre de cas par an,<br />
-                un graphe qui montre les cas les plus mystérieux (beaucoup de témoignages, beaucoup de cas <br />
-                similaires en peu de temps...)
             </TabPanel>
         </div>
     );
