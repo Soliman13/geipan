@@ -242,12 +242,12 @@ const Tableau = (props) => {
                                         </p>
                                         <label className="sousTitre">Date d'observation : </label> {Element.obs_chrono}<br></br>
                                         <label className="sousTitre">Age du témoin : </label> {Element.tem_age}<br></br>
-                                        <label className="sousTitre">Profession du témoins : </label> {Element.tem_xp_activite_type}<br></br>
-                                        <label className="sousTitre">Émotion du témoins : </label> {Element.obs_2_tem_reaction_types}<br></br>
+                                        <label className="sousTitre">Profession du témoin : </label> {Element.tem_xp_activite_type}<br></br>
+                                        <label className="sousTitre">Émotion du témoin : </label> {Element.obs_2_tem_reaction_types}<br></br>
                                         <label className="sousTitre">Lieu d'observation : </label> {Element.obs_1_adr_commune} {Element.obs_1_env_sol}<br></br>
-                                        <label className="sousTitre">Nombre de Pans observés : </label> {Element.obs_nb_PAN}<br></br>
+                                        <label className="sousTitre">Nombre d'objet observés : </label> {Element.obs_nb_PAN}<br></br>
                                         <label className="sousTitre">Mouvement / Trajectoire observé :</label> {Element.obs_1_trajectoire_types} {Element.obs_1_vitesse_lib} {Element.obs_2_trajectoire_types}<br></br>
-                                        <label className="sousTitre">Nature / Forme du Pan</label> {Element.obs_1_forme_lib} {Element.obs_1_forme_types} {Element.obs_1_PAN_nature} {Element.obs_1_caracteristiques_types}<br></br>
+                                        <label className="sousTitre">Nature / Forme de l'objet : </label> {Element.obs_1_forme_lib} {Element.obs_1_forme_types} {Element.obs_1_PAN_nature} {Element.obs_1_caracteristiques_types}<br></br>
                                     </div>
                                 ))}
                             </div>
